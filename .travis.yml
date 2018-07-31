@@ -2,24 +2,19 @@ language: generic
 compiler: gcc
 dist: trusty
 
-before_install:
+before_install: &before_install_cmn
   # g++6
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  
-  # Qt 4,5
-  - sudo apt-add-repository -y ppa:beineri/opt-qt5.10.1-trusty
-  - sudo apt-add-repository -y ppa:beineri/opt-qt596-trusty
   #- sudo apt-add-repository -y ppa:beineri/opt-qt487-trusty
   - sudo apt-get -qq update
 
-install:
+install: &install_cmn
   # g++6
   - sudo apt-get remove g++
   - sudo apt-get install -qq g++-6
 
-  # Qt5
-  - yes | sudo apt-get install --yes qt510base qt59base opt-qt4-x11
-#  - yes | sudo apt-get install --yes qt55base qt55imageformats qt55svg qtdeclarative5-dev
+  #- yes | sudo apt-get install --yes qt510base qt59base opt-qt4-x11
+  # - yes | sudo apt-get install --yes qt55base qt55imageformats qt55svg qtdeclarative5-dev
 
 env: CXX="g++-6" CXXFLAGS="-std=c++11 -Wall -Wno-error"
 
@@ -30,12 +25,26 @@ env: CXX="g++-6" CXXFLAGS="-std=c++11 -Wall -Wno-error"
 
 matrix:
   include:
-    - before_script: # Qt 5.10.1
-      - source /opt/qt510/bin/qt510-env.sh
-    - before_script: # Qt 5.9.6
-      - source /opt/qt59/bin/qt59-env.sh
-    #- before_script: # Qt 4.8.7
-      #- source /opt/qt-4.8/bin/qt-4.8-env.sh
+  - name: "Qt 5.10.1"
+    before_install:
+    - sudo apt-add-repository -y ppa:beineri/opt-qt-5.10.1-trusty
+    - *before_install_cmn
+    install:
+    - *install_cmn
+    - yes | sudo apt-get install -y qt510base
+    before_script: 
+    - source /opt/qt510/bin/qt510-env.sh
+  - name: "Qt 5.9.6"
+    before_install:
+    - sudo apt-add-repository -y ppa:beineri/opt-qt596-trusty
+    - *before_install_cmn
+    install:
+    - *install_cmn
+    - yes | sudo apt-get install -y qt59base
+    before_script:
+    - source /opt/qt59/bin/qt59-env.sh
+  #- before_script: # Qt 4.8.7
+    #- source /opt/qt-4.8/bin/qt-4.8-env.sh
 
 script: 
   - $CXX --version

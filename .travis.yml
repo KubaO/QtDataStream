@@ -1,0 +1,43 @@
+language: generic
+compiler: gcc
+dist: trusty
+
+before_install:
+  # g++6
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  
+  # Qt 4,5
+  - sudo apt-add-repository -y ppa:beineri/opt-qt5.10.1-trusty
+  - sudo apt-add-repository -y ppa:beineri/opt-qt596-trusty
+  #- sudo apt-add-repository -y ppa:beineri/opt-qt487-trusty
+  - sudo apt-get -qq update
+
+install:
+  # g++6
+  - sudo apt-get remove g++
+  - sudo apt-get install -qq g++-6
+
+  # Qt5
+  - yes | sudo apt-get install --yes qt510base qt59base opt-qt4-x11
+#  - yes | sudo apt-get install --yes qt55base qt55imageformats qt55svg qtdeclarative5-dev
+
+env: CXX="g++-6" CXXFLAGS="-std=c++11 -Wall -Wno-error"
+
+#before_script:
+#    - QTDIR="/opt/qt55"
+#    - PATH="$QTDIR/bin:$PATH"
+#    - source /opt/qt55/bin/qt55-env.sh
+
+matrix:
+  include:
+    - before_script: # Qt 5.10.1
+      - source /opt/qt510/bin/qt510-env.sh
+    - before_script: # Qt 5.9.6
+      - source /opt/qt59/bin/qt59-env.sh
+    #- before_script: # Qt 4.8.7
+      #- source /opt/qt-4.8/bin/qt-4.8-env.sh
+
+script: 
+  - $CXX --version
+  - g++-6 --version
+  - qmake && make && cd tests && make release-check debug-check

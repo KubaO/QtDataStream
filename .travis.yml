@@ -17,8 +17,11 @@ env:
   matrix:
     - >
       QT_PPA=ppa:beineri/opt-qt487-trusty
-      QT_PKG="opt-libqt4-dev opt-libqt4-dev-bin opt-libqtcore4 opt-qt4-qmake opt-qt4-dev-tools"
+      QT_PKG=opt-libqt4-dev  
       QT_SRC=/opt/qt-4.8/bin/qt-4.8-env.sh
+
+# Re Qt 4 dependencies - no finer-grained dependencies exist, sorry. See
+# https://launchpadlibrarian.net/207508692/buildlog_ubuntu-trusty-amd64.opt-qt4-x11_4%3A4.8.7-0opt1_BUILDING.txt.gz
 
 before_install:
   # g++6
@@ -37,9 +40,6 @@ install:
 
 before_script:
   - source $QT_SRC
-#  - QTDIR="/opt/qt55"
-#  - PATH="$QTDIR/bin:$PATH"
-#  - source /opt/qt55/bin/qt55-env.sh
 
 script:
   - echo PATH=$PATH

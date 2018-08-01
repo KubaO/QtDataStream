@@ -10,7 +10,6 @@ env:
       QT_PPA=ppa:beineri/opt-qt-5.10.1-trusty
       QT_PKG=qt510base
       QT_SRC=/opt/qt510/bin/qt510-env.sh
-  matrix-ignored:
     - >
       QT_PPA=ppa:beineri/opt-qt596-trusty
       QT_PKG=qt59base

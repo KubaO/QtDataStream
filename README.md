@@ -1,2 +1,2 @@
-# qt_datastream
+QtDataStream
 A movable, returnable version of QDataStream.

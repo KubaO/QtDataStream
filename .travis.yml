@@ -4,7 +4,7 @@ dist: trusty
 
 env:
   global:
-    - CC="gcc-6" CXX="g++-6" #CXXFLAGS="-std=c++11 -Wall -Wno-error"
+    - CXX=g++6
   matrix:
     - >
       QT_PPA=ppa:beineri/opt-qt-5.10.1-trusty
@@ -46,25 +46,27 @@ install:
 
 before_script:
   - source $QT_SRC
+  - echo PATH=$PATH
+  - which qmake gcc g++
+  - g++-6 --version
+  - g++ --version
 
 script:
-  - echo PATH=$PATH
-  - $CXX --version
-  - g++-6 --version
-  - which qmake gcc g++
-  - ln -s $(which $CC)  /home/travis/bin/gcc000
-  - ln -s $(which $CXX) /home/travis/bin/g++000
-  - qmake "QMAKE_CXXFLAGS+=-fprofile-arcs -ftest-coverage $CXXFLAGS" "LIBS+=-lgcov"
-  - cat Makefile*
-  - make
-  - cd tests && make release-check debug-check
+  - >
+    mkdir build && pushd build &&
+    qmake .. && make all && make -C tests debug-check release-check && popd
+  - >
+    mkdir build-gcov && pushd build-gcov &&
+    qmake .. "QMAKE_CXXFLAGS+=-fprofile-arcs -ftest-coverage $CXXFLAGS" "LIBS+=-lgcov" &&
+    make all && make -C tests release-check && popd
 
-after_success:
+after_success-ignored:
   - >
     pwd &&
     for filename in `find .. | egrep '\.cpp'`; do
       gcov-6 -n -o . $filename > /dev/null;
     done
+after_success:
   - >
-    bash <(curl -s https://codecov.io/bash) -e CC,QT_PPA -s tests ||
+    bash <(curl -s https://codecov.io/bash) -e CXX,QT_PPA ||
     echo "Codecov did not collect coverage reports"

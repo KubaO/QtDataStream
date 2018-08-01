@@ -1,0 +1,8 @@
+# See https://docs.codecov.io/docs/codecov-yaml
+# This file is merged with the default yaml
+
+ignore:
+  - "/opt/.*"
+  - "/usr/.*"
+  - "./*.cpp"       # Ignore tests/, as they are mapped to root
+  - "*.moc"         # Ignore generated moc output

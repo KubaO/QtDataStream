@@ -4,7 +4,7 @@ dist: trusty
 
 env:
   global:
-    - CXX="g++-6" CXXFLAGS="-std=c++11 -Wall -Wno-error"
+    - CC="gcc-6" CXX="g++-6" CXXFLAGS="-std=c++11 -Wall -Wno-error"
   matrix:
     - >
       QT_PPA=ppa:beineri/opt-qt-5.10.1-trusty
@@ -16,7 +16,7 @@ env:
       QT_SRC=/opt/qt59/bin/qt59-env.sh
     - >
       QT_PPA=ppa:beineri/opt-qt487-trusty
-      QT_PKG=opt-qt4-x11
+      QT_PKG=opt-libqt4-dev
       QT_SRC=/opt/qt-4.8/bin/qt-4.8-env.sh
 
 before_install:
@@ -44,8 +44,9 @@ script:
   - $CXX --version
   - g++-6 --version
   - which qmake
-  - cat $(which qmake) | strings
-  - alias g++="$CXX" && qmake QMAKE_CXX="$CXX" QMAKE_LINK="$CXX"
+  - ln -s $(which $CC)  /home/travis/bin/gcc
+  - ln -s $(which $CXX) /home/travis/bin/g++
+  - qmake QMAKE_CC="$CC" QMAKE_CXX="$CXX" QMAKE_LINK="$CXX"
   - cat Makefile*
   - make
   - cd tests && make release-check debug-check

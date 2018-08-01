@@ -1,0 +1,9 @@
+#! /bin/bash
+rm -rf build
+set -e
+mkdir build
+pushd build
+/opt/local/libexec/qt5/bin/qmake ..
+make
+make -C tests release-check debug-check
+popd

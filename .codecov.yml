@@ -1,8 +1,11 @@
 # See https://docs.codecov.io/docs/codecov-yaml
 # This file is merged with the default yaml
 
-ignore:
+ignore-nope:
   - "/opt/.*"
   - "/usr/.*"
-  - "./*.cpp"       # Ignore tests/, as they are mapped to root
-  - "*.moc"         # Ignore generated moc output
+  - "tests/.*"      # Ignore tests/
+  - "*/*.moc"       # Ignore generated moc output
+
+fixes:
+  - "../..::"       # Go from /build-gcov/tests/ to /

@@ -47,7 +47,7 @@ install:
 before_script:
   - source $QT_SRC
   - echo PATH=$PATH
-  - which qmake gcc g++
+  - which qmake gcc g++ gcov
   - g++-6 --version
   - g++ --version
 
@@ -60,13 +60,11 @@ script:
     qmake .. "QMAKE_CXXFLAGS+=-fprofile-arcs -ftest-coverage $CXXFLAGS" "LIBS+=-lgcov" &&
     make all && make -C tests release-check && popd
 
-after_success-ignored:
+after_success:
+  - ls -lR
+  - cd build-gcov/tests
+  - find . -name '*.gcno' -exec echo "Output file '{}'" ";" -exec gcov -pbr '{}' '+' || true
   - >
     pwd &&
-    for filename in `find .. | egrep '\.cpp'`; do
-      gcov-6 -n -o . $filename > /dev/null;
-    done
-after_success:
-  - >
-    bash <(curl -s https://codecov.io/bash) -e CXX,QT_PPA ||
+    bash <(curl -s https://codecov.io/bash) -e CXX,QT_PPA -X gcov -p . -g './debug#*' -g './^#^#tests#*' ||
     echo "Codecov did not collect coverage reports"

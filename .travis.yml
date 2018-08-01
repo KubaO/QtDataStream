@@ -14,22 +14,22 @@ env:
       QT_PPA=ppa:beineri/opt-qt596-trusty
       QT_PKG=qt59base
       QT_SRC=/opt/qt59/bin/qt59-env.sh
-    #- >
-      #QT_PPA=ppa:beineri/opt-qt487-trusty
-      #QT_PKG=opt-qt4-x11
-      #QT_SRC=/opt/qt-4.8/bin/qt-4.8-env.sh
+    - >
+      QT_PPA=ppa:beineri/opt-qt487-trusty
+      QT_PKG=opt-qt4-x11
+      QT_SRC=/opt/qt-4.8/bin/qt-4.8-env.sh
 
 before_install:
   # g++6
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   # Qt
   - sudo add-apt-repository -y $QT_PPA
-  - sudo apt-get -qq update
+  - sudo apt-get -q update
 
 install:
   # g++6
   - sudo apt-get remove g++
-  - sudo apt-get install -qq g++-6
+  - sudo apt-get install -q g++-6
   # Qt
   - yes | sudo apt-get install -y $QT_PKG
 
@@ -43,7 +43,9 @@ script:
   - echo PATH=$PATH
   - $CXX --version
   - g++-6 --version
-  - qmake QMAKE_CXX=$CXX QMAKE_LINK=$CXX
+  - which qmake
+  - cat $(which qmake) | strings
+  - alias g++="$CXX" && qmake QMAKE_CXX="$CXX" QMAKE_LINK="$CXX"
   - cat Makefile*
   - make
   - cd tests && make release-check debug-check

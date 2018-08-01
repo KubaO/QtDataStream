@@ -5,7 +5,7 @@ dist: trusty
 env:
   global:
     - CC="gcc-6" CXX="g++-6" CXXFLAGS="-std=c++11 -Wall -Wno-error"
-  matrix:
+  matrix-ignored:
     - >
       QT_PPA=ppa:beineri/opt-qt-5.10.1-trusty
       QT_PKG=qt510base
@@ -14,9 +14,10 @@ env:
       QT_PPA=ppa:beineri/opt-qt596-trusty
       QT_PKG=qt59base
       QT_SRC=/opt/qt59/bin/qt59-env.sh
+  matrix:
     - >
       QT_PPA=ppa:beineri/opt-qt487-trusty
-      QT_PKG=opt-libqt4-dev
+      QT_PKG="opt-libqt4-dev opt-libqt4-dev-bin opt-libqtcore4 opt-qt4-qmake opt-qt4-dev-tools"
       QT_SRC=/opt/qt-4.8/bin/qt-4.8-env.sh
 
 before_install:

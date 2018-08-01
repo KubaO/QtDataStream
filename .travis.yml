@@ -2,51 +2,48 @@ language: generic
 compiler: gcc
 dist: trusty
 
-before_install: &before_install_cmn
+env:
+  global:
+    - CXX="g++-6" CXXFLAGS="-std=c++11 -Wall -Wno-error"
+  matrix:
+    - >
+      QT_PPA=ppa:beineri/opt-qt-5.10.1-trusty
+      QT_PKG=qt510base
+      QT_SRC=/opt/qt510/bin/qt510-env.sh
+    - >
+      QT_PPA=ppa:beineri/opt-qt596-trusty
+      QT_PKG=qt59base
+      QT_SRC=/opt/qt59/bin/qt59-env.sh
+    #- >
+      #QT_PPA=ppa:beineri/opt-qt487-trusty
+      #QT_PKG=opt-qt4-x11
+      #QT_SRC=/opt/qt-4.8/bin/qt-4.8-env.sh
+
+before_install:
   # g++6
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  #- sudo apt-add-repository -y ppa:beineri/opt-qt487-trusty
+  # Qt
+  - sudo add-apt-repository -y $QT_PPA
   - sudo apt-get -qq update
 
-install: &install_cmn
+install:
   # g++6
   - sudo apt-get remove g++
   - sudo apt-get install -qq g++-6
+  # Qt
+  - yes | sudo apt-get install -y $QT_PKG
 
-  #- yes | sudo apt-get install --yes qt510base qt59base opt-qt4-x11
-  # - yes | sudo apt-get install --yes qt55base qt55imageformats qt55svg qtdeclarative5-dev
+before_script:
+  - source $QT_SRC
+#  - QTDIR="/opt/qt55"
+#  - PATH="$QTDIR/bin:$PATH"
+#  - source /opt/qt55/bin/qt55-env.sh
 
-env: CXX="g++-6" CXXFLAGS="-std=c++11 -Wall -Wno-error"
-
-#before_script:
-#    - QTDIR="/opt/qt55"
-#    - PATH="$QTDIR/bin:$PATH"
-#    - source /opt/qt55/bin/qt55-env.sh
-
-matrix:
-  include:
-  - name: "Qt 5.10.1"
-    before_install:
-    - sudo apt-add-repository -y ppa:beineri/opt-qt-5.10.1-trusty
-    - *before_install_cmn
-    install:
-    - *install_cmn
-    - yes | sudo apt-get install -y qt510base
-    before_script: 
-    - source /opt/qt510/bin/qt510-env.sh
-  - name: "Qt 5.9.6"
-    before_install:
-    - sudo apt-add-repository -y ppa:beineri/opt-qt596-trusty
-    - *before_install_cmn
-    install:
-    - *install_cmn
-    - yes | sudo apt-get install -y qt59base
-    before_script:
-    - source /opt/qt59/bin/qt59-env.sh
-  #- before_script: # Qt 4.8.7
-    #- source /opt/qt-4.8/bin/qt-4.8-env.sh
-
-script: 
+script:
+  - echo PATH=$PATH
   - $CXX --version
   - g++-6 --version
-  - qmake && make && cd tests && make release-check debug-check
+  - qmake QMAKE_CXX=$CXX QMAKE_LINK=$CXX
+  - cat Makefile*
+  - make
+  - cd tests && make release-check debug-check

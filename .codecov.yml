@@ -1,11 +1,16 @@
 # See https://docs.codecov.io/docs/codecov-yaml
 # This file is merged with the default yaml
+# This file is used by the codecov.io service, *not* by the bash
+# uploader.
 
 ignore-nope:
   - "/opt/.*"
   - "/usr/.*"
   - "tests/.*"      # Ignore tests/
   - "*/*.moc"       # Ignore generated moc output
+
+ignore:
+  - "tests/.*"
 
 fixes:
   - "../..::"       # Go from /build-gcov/tests/ to /

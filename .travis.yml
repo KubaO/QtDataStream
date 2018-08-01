@@ -62,8 +62,8 @@ script:
 after_success:
   - ls -lR
   - cd build-gcov/tests
-  - find . -name '*.gcno' -exec echo "Output file '{}'" ";" -exec gcov -pbr '{}' '+' || true
+  - find release -name '*.gcno' -exec echo "Output file '{}'" ";" -exec gcov -pbr '{}' ';' || true
   - >
     pwd &&
-    bash <(curl -s https://codecov.io/bash) -e CXX,QT_PPA -X gcov -p . -g './debug#*' -g './^#^#tests#*' ||
+    bash <(curl -s https://codecov.io/bash) -e CXX,QT_PPA -X gcov -p . -g '"./debug#*"' -g '"./^#^#tests#*"' ||
     echo "Codecov did not collect coverage reports"

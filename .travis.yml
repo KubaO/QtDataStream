@@ -30,6 +30,7 @@ install:
   # g++6
   - sudo apt-get remove g++
   - sudo apt-get install -q g++-6
+  - sudo apt autoremove
   # Qt
   - yes | sudo apt-get install -y $QT_PKG
 

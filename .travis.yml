@@ -1,6 +1,7 @@
 language: generic
 os: linux
 dist: trusty
+git: { depth: 2, quiet: true }
 
 env:
   global:

@@ -87,5 +87,5 @@ after_success:
   - find release -name '*.gcno' -exec echo "Output file '{}'" ";" -exec gcov -pb '{}' ';' || true
   - >
     pwd &&
-    bash <(curl -s https://codecov.io/bash) -e TRAVIS_OS_NAME,QT_PKG -X gcov -p . -g './#*' -g './debug#*' -g './^#^#tests#*' ||
+    bash <(curl -s https://codecov.io/bash) -e QT_PKG -X gcov -p . -g './#*' -g './debug#*' -g './^#^#tests#*' ||
     echo "Codecov did not collect coverage reports"

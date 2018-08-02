@@ -3,7 +3,7 @@ rm -rf build
 set -e
 mkdir build
 pushd build
-/opt/local/libexec/qt5/bin/qmake ..
+/opt/local/libexec/qt5/bin/qmake .. "QMAKE_CXXFLAGS+=-coverage" "QMAKE_LFLAGS+=-coverage"
 make
 make -C tests release-check debug-check
 popd

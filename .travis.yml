@@ -20,6 +20,12 @@ matrix:
         - QT_PPA=ppa:beineri/opt-qt596-trusty
         - QT_PKG=qt59base
         - QT_SRC=/opt/qt59/bin/qt59-env.sh
+    - name: "Trusty - Qt 5.6"
+      dist: trusty
+      env:
+        - QT_PPA=ppa:beineri/opt-qt563-trusty
+        - QT_PKG=qt56base
+        - QT_SRC=/opt/qt59/bin/qt56-env.sh
     - name: "Trusty - Qt 4.8"
       dist: trusty
       env:
@@ -34,6 +40,16 @@ matrix:
       env:
         - PATH="/opt/local/libexec/qt5/bin/:$PATH"
         - QT_PKG=qt5-qtbase
+    - name: "OS X - Qt 5.9 LTS"
+      os: osx
+      env:
+        - PATH="/opt/local/libexec/qt5/bin/:$PATH"
+        - QT_PKG=qt59-qtbase
+    - name: "OS X - Qt 5.6 LTS"
+      os: osx
+      env:
+        - PATH="/opt/local/libexec/qt5/bin/:$PATH"
+        - QT_PKG=qt56-qtbase
     - name: "OS X - Qt 4.8"
       os: osx
       env:

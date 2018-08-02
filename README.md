@@ -5,3 +5,10 @@
 [![codecov.io](https://codecov.io/github/KubaO/QtDataStream/coverage.svg?branch=master)](https://codecov.io/github/KubaO/QtDataStream/branch/master)
 
 A movable, returnable version of QDataStream.
+
+# TODO
+
+- Add Appveyor build.
+- Factor out scripts from travis.yml
+- Apply knowledge from https://github.com/mapbox/hpp-skel
+- Apply knowledge from https://github.com/boostorg/hana/blob/master/.travis.yml

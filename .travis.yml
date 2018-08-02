@@ -1,109 +1,144 @@
 language: generic
+os: linux
+dist: trusty
 
 env:
   global:
-    - LNX=$([ "$TRAVIS_OS_NAME" == osx ] && echo "1" || echo "")
-    - OSX=$([ "$TRAVIS_OS_NAME" == linux ] && echo "1" || echo "")
+    - UNIT_TESTS=true
     - MACPORTS_CI_COMMIT=1f1bc5dfb9411ca2f4265d43c63613b7add68261  # or master
-
-addons:
-  apt:
-    sources:
-      - sourceline: 'ppa:ubuntu-toolchain-r/test'
-    packages:
-      - g++-6
-    update: true
 
 matrix:
   include:
+    # GCC 6, Trusty
     - name: "Trusty - Qt 5.10"
-      dist: trusty
-      env:
-        - QT_PPA=ppa:beineri/opt-qt-5.10.1-trusty
-        - QT_PKG=qt510base
-        - QT_SRC=/opt/qt510/bin/qt510-env.sh
+      env: COMPILER=g++-6 GCOV=gcov-6 QT_PPA=ppa:beineri/opt-qt-5.10.1-trusty QT_PKG=qt510base QT_SRC=/opt/qt510/bin/qt510-env.sh
+      addons: &gxx6 { apt: { packages: ["g++-6"], sources: ["ubuntu-toolchain-r-test"], update: true } }
+
     - name: "Trusty - Qt 5.9"
-      dist: trusty
-      env:
-        - QT_PPA=ppa:beineri/opt-qt596-trusty
-        - QT_PKG=qt59base
-        - QT_SRC=/opt/qt59/bin/qt59-env.sh
+      env: COMPILER=g++-6 GCOV=gcov-6 QT_PPA=ppa:beineri/opt-qt596-trusty QT_PKG=qt59base QT_SRC=/opt/qt59/bin/qt59-env.sh
+      addons: *gxx6
+
     - name: "Trusty - Qt 5.6"
-      dist: trusty
-      env:
-        - QT_PPA=ppa:beineri/opt-qt563-trusty
-        - QT_PKG=qt56base
-        - QT_SRC=/opt/qt59/bin/qt56-env.sh
+      env: COMPILER=g++-6 GCOV=gcov-6 QT_PPA=ppa:beineri/opt-qt563-trusty QT_PKG=qt56base QT_SRC=/opt/qt59/bin/qt56-env.sh
+      addons: *gxx6
+
     - name: "Trusty - Qt 4.8"
-      dist: trusty
-      env:
-        - QT_PPA=ppa:beineri/opt-qt487-trusty
-        - QT_PKG=opt-libqt4-dev
-        - QT_SRC=/opt/qt-4.8/bin/qt-4.8-env.sh
-        - CXXFLAGS="-std=c++11"
-        # Re Qt 4 dependencies - no finer-grained dependencies exist, sorry. See
-        # https://launchpadlibrarian.net/207508692/buildlog_ubuntu-trusty-amd64.opt-qt4-x11_4%3A4.8.7-0opt1_BUILDING.txt.gz
-    - name: "OS X - Qt 5 latest"
+      env: COMPILER=g++-6 GCOV=gcov-6 QT_PPA=ppa:beineri/opt-qt487-trusty QT_PKG=opt-libqt4-dev QT_SRC=/opt/qt-4.8/bin/qt-4.8-env.sh CXXFLAGS="-std=c++11"
+      addons: *gxx6
+
+    # OS X 10.13, xcode 9.4
+    - name: "OS X 10.13 - Qt 5 latest, xcode 9.4"
       os: osx
-      env:
-        - PATH="/opt/local/libexec/qt5/bin/:$PATH"
-        - QT_PKG=qt5-qtbase
-    - name: "OS X - Qt 5.9 LTS"
+      osx_image: xcode9.4
+      env: &mp_qt5_10 QT_PKG=qt5-qtbase QT_SRC=/opt/local/libexec/qt5/bin
+
+    - name: "OS X 10.13 - Qt 5.9 LTS, xcode 9.4"
       os: osx
-      env:
-        - PATH="/opt/local/libexec/qt5/bin/:$PATH"
-        - QT_PKG=qt59-qtbase
-    - name: "OS X - Qt 5.6 LTS"
+      osx_image: xcode9.4
+      env: &mp_qt5_9 QT_PKG=qt59-qtbase QT_SRC=/opt/local/libexec/qt5/bin
+
+    - name: "OS X 10.13 - Qt 5.6 LTS, xcode 9.4"
       os: osx
-      env:
-        - PATH="/opt/local/libexec/qt5/bin/:$PATH"
-        - QT_PKG=qt56-qtbase
-    - name: "OS X - Qt 4.8"
+      osx_image: xcode9.4
+      env: &mp_qt5_6 QT_PKG=qt56-qtbase QT_SRC=/opt/local/libexec/qt5/bin
+
+    - name: "OS X 10.13 - Qt 4.8, xcode 9.4"
       os: osx
-      env:
-        - PATH="/opt/local/libexec/qt4/bin/:$PATH"
-        - QT_PKG=qt4-mac
-        - CXXFLAGS="-std=c++11"
+      osx_image: xcode9.4
+      env: &mp_qt4 QT_PKG=qt4-mac QT_SRC=/opt/local/libexec/qt4/bin CXXFLAGS="-std=c++11"
 
 before_install:
-  # Qt
-  - \[ $LNX ] || sudo add-apt-repository -y $QT_PPA
-  - \[ $LNX ] || sudo apt-get -q update
-  # macports
-  - \[ $OSX ] || curl -LO https://raw.githubusercontent.com/GiovanniBussi/macports-ci/${MACPORTS_CI_COMMIT}/macports-ci
-  - \[ $OSX ] || source ./macports-ci install
+  ####
+  # Add local binaries
+  - mkdir -p ~/bin
+  #- export PATH=~/bin:"${PATH}"
+  ####
+  # Add apt repositories
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      sudo add-apt-repository -y $QT_PPA
+      sudo apt-get -q update
+    fi
+  ####
+  # Install macports
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      curl -LO https://raw.githubusercontent.com/GiovanniBussi/macports-ci/${MACPORTS_CI_COMMIT}/macports-ci
+      source ./macports-ci install;
+    fi
+  - echo "CXX=${CXX} PATH=${PATH}"
 
 install:
-  - \[ $LNX ] || which gcc g++
-  # Qt
-  - \[ $LNX ] || sudo apt-get install -y $QT_PKG
-  - \[ $OSX ] || sudo port -N install $QT_PKG
+  - echo "CXX=${CXX} PATH=${PATH}"
+  ####
+  # Install Qt
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      sudo apt-get install -y $QT_PKG
+    else
+      sudo port -N install $QT_PKG
+    fi
+
+  ####
   # Select the compiler
-  - \[ $LNX ] || sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-6 90
-  - \[ $LNX ] || sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
-  - \[ $LNX ] || sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 90
+  - |
+    if [[ "${COMPILER}" != "" ]]; then
+      export CXX=${COMPILER};
+      ln -s $(which ${CXX}) ~/bin/g++
+    fi
+    if [[ "${GCOV}" != "" ]]; then
+      ln -s $(which ${GCOV}) ~/bin/gcov
+    fi
+  - echo "CXX=${CXX} PATH=${PATH}"
 
 before_script:
-  - \[ $QT_SRC ] && source $QT_SRC || true
-  - echo PATH=$PATH
-  - which qmake gcc g++ gcov
-  - \[ $LNX ] || g++-6 --version
+  - echo "CXX=${CXX} PATH=${PATH}"
+  ####
+  # Make Qt available in the path
+  - if [[ -f "${QT_SRC}" || -L "${QT_SRC}" ]]; then source ${QT_SRC}; fi
+  - if [[ -d "${QT_SRC}" ]]; then export PATH=${QT_SRC}:"${PATH}"; fi
+
+  ####
+  # Show settings
+  - echo "CXX=${CXX} PATH=${PATH}"
+  - which qmake g++ gcov
   - g++ --version
 
 script:
-  - >
-    mkdir build && pushd build &&
-    qmake .. && make all && make -C tests debug-check release-check && popd
-  - >
-    mkdir build-cov && pushd build-cov &&
-    qmake .. "QMAKE_CXXFLAGS+=-coverage $CXXFLAGS" "LIBS+=-coverage" &&
-    make all && make -C tests release-check && popd
+  ####
+  # Full build
+  - |
+    mkdir build
+    pushd build
+    qmake ..
+    make all
+    if [[ "${UNIT_TESTS}" == "true" ]]; then
+      make -C tests debug-check release-check
+    fi
+    popd
+
+  ####
+  # Test coverage build
+  - |
+    if [[ "${UNIT_TESTS}" == "true" ]]; then
+      mkdir build-cov
+      pushd build-cov
+      qmake .. "QMAKE_CXXFLAGS+=-coverage $CXXFLAGS" "LIBS+=-coverage"
+      make all
+      make -C tests release-check
+      popd
+    fi
 
 after_success:
+  - echo "CXX=${CXX} PATH=${PATH}"
   - ls -lR
-  - pushd build-cov/tests
-  - find release -name '*.gcno' -exec echo "Output file '{}'" ";" -exec gcov -pb '{}' ';' || true
-  - >
-    pwd &&
-    bash <(curl -s https://codecov.io/bash) -e QT_PKG -X gcov -p . -g './#*' -g './debug#*' -g './^#^#tests#*' ||
-    echo "Codecov did not collect coverage reports"
+  ####
+  # Upload test coverage
+  - |
+    if [[ "${UNIT_TESTS}" == "true" ]]; then
+      pushd build-cov/tests
+      find release -name '*.gcno' -exec echo "Output file '{}'" ";" -exec gcov -pb '{}' ';' || true
+      bash <(curl -s https://codecov.io/bash) -e QT_PKG -X gcov -p . -g './#*' -g './debug#*' -g './^#^#tests#*' \
+      || echo "Codecov did not collect coverage reports"
+      popd
+    fi

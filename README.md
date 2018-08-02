@@ -11,4 +11,7 @@ A movable, returnable version of QDataStream.
 - Add Appveyor build.
 - Factor out scripts from travis.yml
 - Apply knowledge from https://github.com/mapbox/hpp-skel
-- Apply knowledge from https://github.com/boostorg/hana/blob/master/.travis.yml
+
+# See Also for Developers
+
+- Cool .travis.yml example: https://github.com/boostorg/hana/blob/master/.travis.yml
